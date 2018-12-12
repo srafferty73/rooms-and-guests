@@ -2,44 +2,69 @@ require('minitest/autorun')
 require('minitest/rg')
 require_relative('../rooms')
 require_relative('../guests')
+require_relative('../songs')
 
 class TestRooms < MiniTest::Test
 
   def setup
-    @room1 = Rooms.new("Penthouse", 0, 2)
-    @room2 = Rooms.new("Standard", 0, 1)
-    @room3 = Rooms.new("Advanced", 1, 0)
-    @guest1 = Guests.new("Jimmy", @room1)
+    @song1 = Songs.new("Wind Beneath My Wings")
+    @song2 = Songs.new("Love Me Do")
+    @song3 = Songs.new("Wonderwall")
+
+    @guest1 = Guests.new("Alfred", 100)
+    @guest2 = Guests.new("Brian", 50)
+    @guest3 = Guests.new("Colin", 75)
+    @guest4 = Guests.new("Derek", 90)
+    @guest5 = Guests.new("Edward", 45)
+    @guest6 = Guests.new("Freddy", 150)
+    @guest7 = Guests.new("George", 105)
+    guests_grp_one = [@guest1, @guest2]
+    guests_grp_two = [@guest3, @guest4]
+
+    @room1 = Rooms.new("Standard", guests_grp_one, ["Wonderwall"])
+    @room2 = Rooms.new("Advanced", guests_grp_two, [])
+    @room3 = Rooms.new("Penthouse", [], [])
   end
 
   def test_room_name
-    assert_equal("Penthouse", @room1.room_name)
+    assert_equal("Standard", @room1.room_name)
   end
 
-  def test_no_of_guests
-    assert_equal(0, @room1.no_of_guests)
+  def test_room_guests
+    assert_equal([@guest3, @guest4], @room2.room_guests)
   end
 
-  def test_no_of_songs
-    assert_equal(2, @room1.no_of_songs)
+  def test_room_songs
+    assert_equal(["Wonderwall"], @room1.room_songs)
   end
 
-  def test_guest_name
-    assert_equal("Jimmy", @guest1.guest_name)
+  def test_add_guest__space
+    @room3.add_guest(@guest5)
+    assert_equal(1, @room3.calculate_guests)
   end
 
-  def test_guest_check__in
-    @room1.no_of_guests += 1
-    assert_equal(1, @room1.no_of_guests)
+  def test_add_guest__no_space
+    @room3.add_guest(@guest5)
+    @room3.add_guest(@guest6)
+    @room3.add_guest(@guest7)
+    assert_equal("Room already full", @room3.calculate_guests)
   end
 
-  def test_guest_check__out
-    @room1.no_of_guests = 0
-    assert_equal(0, @room1.no_of_guests)
+  def test_remove_guest
+    @room1.remove_guest(@guest1)
+    assert_equal(1, @room1.calculate_guests)
+  end
+
+  def test_calculate_guests
+    assert_equal(2, @room1.calculate_guests)
   end
 
   def test_add_song
-    @room1.no_of_songs += 1
-    assert_equal(3, @room1.no_of_songs)
+    @room2.add_song(@song2)
+    assert_equal(1, @room2.calculate_songs)
   end
+
+
+
+
 end
